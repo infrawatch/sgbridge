@@ -134,6 +134,7 @@ static bool handle(app_data_t *app, pn_event_t *event, int *batch_done) {
             pn_connection_set_container(c, app->container_id);
             pn_connection_open(c);
             pn_session_t *s = pn_session(c);
+            pn_session_set_incoming_capacity(s, 15000);
             pn_session_open(s);
             {
                 pn_link_t *l = pn_receiver(s, "sa_receiver");
