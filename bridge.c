@@ -157,7 +157,7 @@ int main(int argc, char **argv) {
     app.peer_port = DEFAULT_INET_PORT;
     app.ring_buffer_size = atoi(DEFAULT_RING_BUFFER_SIZE);
     app.ring_buffer_count = atoi(DEFAULT_RING_BUFFER_COUNT);
-
+    
     int num_args = sizeof(option_info) / sizeof(struct option_info);
     struct option *longopts = malloc(sizeof(struct option) * num_args);
     for (int i = 0; i < num_args; i++) {
@@ -232,22 +232,21 @@ int main(int argc, char **argv) {
 
     match_regex(AMQP_URL_REGEX,
                 matches, 10, app.amqp_con.url);
-    if (matches[2] != NULL) {
+    if (matches[3] != NULL) {
         app.amqp_con.user = strdup(matches[2]);
     }
-    if (matches[4] != NULL) {
+    if (matches[5] != NULL) {
         app.amqp_con.password = strdup(matches[4]);
     }
-    if (matches[5] == NULL || matches[8] == NULL) {
+    if (matches[6] == NULL || matches[9] == NULL) {
         fprintf(stderr,"Invalid AMQP URL: %s", app.amqp_con.url);
         exit(1);
     }
-    app.amqp_con.host = strdup(matches[5]);
-    app.amqp_con.address = strdup(matches[8]);
-    if (matches[7] != NULL) {
-        app.amqp_con.port = strdup(matches[7]);
+    app.amqp_con.host = strdup(matches[6]);
+    app.amqp_con.address = strdup(matches[9]);
+    if (matches[8] != NULL) {
+        app.amqp_con.port = strdup(matches[8]);
     }
-    
 
     if (app.standalone) {
         printf("Standalone mode\n");
@@ -270,12 +269,13 @@ int main(int argc, char **argv) {
     while (1) {
         sleep(1);
         if (sleep_count == app.stat_period) {
-            printf("in: %ld(%ld), amqp_overrun: %ld(%ld), out: %ld(%ld), sock_overrun: %ld(%ld), batch_size: %f\n",
+            printf("in: %ld(%ld), amqp_overrun: %ld(%ld), out: %ld(%ld), sock_overrun: %ld(%ld), link_credit: %f\n",
                    app.amqp_received, app.amqp_received - last_amqp_received,
                    app.rbin->overruns, app.rbin->overruns - last_overrun,
                    app.sock_sent, app.sock_sent - last_out,
                    app.sock_would_block, app.sock_would_block - last_sock_overrun,
-                   app.amqp_received/(float)app.amqp_total_batches);
+                   app.link_credit/(float) app.amqp_received);
+
             sleep_count = 1;
         }
         last_amqp_received = app.amqp_received;
