@@ -76,11 +76,11 @@ static void handle_receive(app_data_t *app, pn_event_t *event, int *batch_done) 
             rb_put(app->rbin);
 
             app->amqp_received++;
-
             pn_delivery_update(d, PN_ACCEPTED);
             pn_delivery_settle(d); /* settle and free d */
 
             int link_credit = pn_link_credit(l);
+            app->link_credit += link_credit;
             int free = rb_free_size(app->rbin);
             int credit = free - link_credit + 1;
             if ( credit > 0 ) {
@@ -304,7 +304,10 @@ void *amqp_rcv_th(void *app_ptr) {
         /* Initialize Sasl transport */
         pn_transport_t *pnt = pn_transport();
         pn_sasl_set_allow_insecure_mechs(pn_sasl(pnt), true);
-        pn_proactor_connect2(app->proactor, NULL, NULL, addr);
+        if ( app->verbose>1) {
+            pn_transport_trace(pnt,PN_TRACE_FRM);
+        }
+        pn_proactor_connect2(app->proactor, NULL, pnt, addr);
     }
 
     run(app);

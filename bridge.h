@@ -24,7 +24,7 @@
 #define DEFAULT_RING_BUFFER_COUNT "5000"
 #define DEFAULT_RING_BUFFER_SIZE "2048"
 
-#define AMQP_URL_REGEX "^amqp://(([a-z]+)(:([a-z]+))*@)*([a-zA-Z_0-9.-]+)(:([0-9]+))*(.+)$"
+#define AMQP_URL_REGEX "^(amqps*)://(([a-z]+)(:([a-z]+))*@)*([a-zA-Z_0-9.-]+)(:([0-9]+))*(.+)$"
 //#define AMQP_URL_REGEX "^amqp://"
 
 typedef struct {
@@ -68,13 +68,13 @@ typedef struct  {
     rb_rwbytes_t *rbin;
 
     /* Rcv stats */
-    long amqp_received;
-    long amqp_partial;
-    long amqp_total_batches;
-    long amqp_link_credit;
+    volatile long amqp_received;
+    volatile long amqp_partial;
+    volatile long amqp_total_batches;
+    volatile long amqp_link_credit;
 
     /* Ring buffer stats */
-    int max_q_depth;
+    volatile long link_credit;
 
     /* Snd stats */
     long sock_sent;
