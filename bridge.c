@@ -93,7 +93,7 @@ static void usage(char *program) {
     fprintf(stdout, "args:\n");
     for (int i = 0; i < (sizeof(option_info) / sizeof(option_info[0])); i++) {
         char help_buffer[200];
-        sprintf(help_buffer, option_info[i].arg_help, option_info[i].arg_default);
+        snprintf(help_buffer, sizeof(help_buffer), option_info[i].arg_help, option_info[i].arg_default);
         fprintf(stdout, "  --%-*s %-*s %s\n", widths[0], option_info[i].lopt.name, widths[1], option_info[i].arg_example, help_buffer);
     }
 }
@@ -144,7 +144,7 @@ int main(int argc, char **argv) {
 
     setvbuf(stdout, NULL, _IOLBF, BUFSIZ);
 
-    sprintf(cid_buf, DEFAULT_CID, rand() % 1024);
+    snprintf(cid_buf, sizeof(cid_buf), DEFAULT_CID, rand() % 1024);
 
     app.stat_period = 0;        /* disabled */
     app.container_id = cid_buf; /* Should be unique */
@@ -202,7 +202,7 @@ int main(int argc, char **argv) {
                 app.domain = AF_INET;
                 break;
             case ARG_CID:
-                sprintf(cid_buf, optarg);
+                strncpy(cid_buf, sizeof(cid_buf) - 1, optarg);
                 break;
             case ARG_COUNT:
                 app.message_count = atoi(optarg);
