@@ -296,6 +296,8 @@ int main(int argc, char **argv) {
     long last_overrun = 0;
     long last_out = 0;
     long last_sock_overrun = 0;
+    long last_decode_errs = 0;
+    long last_total_batches = 0;
 
     long sleep_count = 1;
 
@@ -303,13 +305,14 @@ int main(int argc, char **argv) {
         sleep(1);
         if (sleep_count == app.stat_period) {
             printf("in: %ld(%ld), amqp_overrun: %ld(%ld), out: %ld(%ld), "
-                   "sock_overrun: %ld(%ld), batch_size: %f\n",
+                   "sock_overrun: %ld(%ld), event_batches: %ld(%ld), amqp_decode_errors: %ld(%ld)\n",
                    app.amqp_received, app.amqp_received - last_amqp_received,
                    app.rbin->overruns, app.rbin->overruns - last_overrun,
                    app.sock_sent, app.sock_sent - last_out,
                    app.sock_would_block,
                    app.sock_would_block - last_sock_overrun,
-                   app.amqp_received / (float)app.amqp_total_batches);
+                   app.amqp_total_batches, app.amqp_total_batches - last_total_batches,
+                   app.amqp_decode_errs, app.amqp_decode_errs - last_decode_errs);
             sleep_count = 0;
         }
         sleep_count++;
@@ -317,6 +320,8 @@ int main(int argc, char **argv) {
         last_overrun = app.rbin->overruns;
         last_out = app.sock_sent;
         last_sock_overrun = app.sock_would_block;
+        last_decode_errs = app.amqp_decode_errs;
+        last_total_batches = app.amqp_total_batches;
 
         if (app.socket_snd_th_running == 0) {
             pthread_join(app.socket_snd_th, NULL);
