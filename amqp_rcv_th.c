@@ -97,8 +97,9 @@ static void handle_receive(app_data_t *app, pn_event_t *event,
                 exit_code = 1;
             }
         } else {
-            app->amqp_partial++;  //**CS This is unused? Should print it on stats
-            fprintf(stderr, "Partial messages processed: %ld\n", app->amqp_partial);
+            app->amqp_partial++; //**CS This is unused? Should print it on stats
+            fprintf(stderr, "Partial messages processed: %ld\n",
+                    app->amqp_partial);
         }
     }
 }
@@ -264,12 +265,16 @@ void run(app_data_t *app) {
             if (!handle(app, e, &batch_done)) {
                 return;
             }
-            if (batch_done) {  //*CS I'm not seeing anywhere this can become true, but the loop will exit when pn_event_batch_next() returns NULL anyways
+            if (batch_done) { //*CS I'm not seeing anywhere this can become
+                              //true, but the loop will exit when
+                              //pn_event_batch_next() returns NULL anyways
                 break;
             }
         }
 
-        app->amqp_total_batches++;  //*CS How is amqp_total_batches growing larger than amqp_received which increments inside handle()?
+        app->amqp_total_batches++; //*CS How is amqp_total_batches growing
+                                   //larger than amqp_received which increments
+                                   //inside handle()?
         fprintf(stderr, "Done processing a batch\n");
         pn_proactor_done(app->proactor, events);
     } while (true);

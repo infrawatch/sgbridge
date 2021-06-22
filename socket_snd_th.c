@@ -120,7 +120,7 @@ static int process_message_binary(app_data_t *app, pn_data_t *body) {
             }
         } else {
             app->sock_sent++;
-            //fprintf(stderr, "Sent %ld bytes to socket\n", sent_bytes);
+            // fprintf(stderr, "Sent %ld bytes to socket\n", sent_bytes);
         }
     }
     return 0;
@@ -142,7 +142,8 @@ static int process_message_body(app_data_t *app, pn_data_t *body) {
                pn_data_type(body) == PN_BINARY) {
         err = process_message_binary(app, body);
     } else {
-        //perror("Unexpected message datatype recieved.");  //*CS Does pn_data_type() set errno??
+        // perror("Unexpected message datatype recieved.");  //*CS Does
+        // pn_data_type() set errno??
         fprintf(stderr, "Unexpected message datatype recieved.");
         err = 1;
     }
@@ -169,13 +170,13 @@ static int decode_message(app_data_t *app, pn_rwbytes_t data) {
             if (err) {
                 return 1;
             }
-        }else{
+        } else {
             fprintf(stderr, "pn_data_next returned false\n");
         }
     } else {
         // Record the error.  Don't exit immediately
         //
-        app->amqp_decode_errs++;  //*CS Never read anywhere. Are these ocurring?
+        app->amqp_decode_errs++; //*CS Never read anywhere. Are these ocurring?
         fprintf(stderr, "AMQP Decode Error\n");
         return 1;
     }
