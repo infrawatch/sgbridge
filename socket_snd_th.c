@@ -15,6 +15,9 @@
 #include <sys/un.h>
 #include <unistd.h>
 
+//*CS
+#include <linux/limits.h>
+
 #include "bridge.h"
 #include "rb.h"
 #include "utils.h"
@@ -153,6 +156,16 @@ static int process_message_body(app_data_t *app, pn_data_t *body) {
 static int decode_message(app_data_t *app, pn_rwbytes_t data) {
     pn_message_t *m;
 
+    //*CS Write content to file for analysis
+    FILE *fptr;
+    static long int filecount = 0;
+    char fname[PATH_MAX];
+    sprintf(fname, "/tmp/rb-amqpdump%ld", filecount++);
+    fprintf(stderr, "Writing %s (%ld bytes from %p)\n", fname, data.size, data.start);
+    fptr = fopen(fname, "w");
+    fwrite(data.start, sizeof(char), data.size, fptr);
+    fclose(fptr);
+
     // Use a static message with pn_message_clear(...)
     if ((m = m_glbl) == NULL) {
         m_glbl = pn_message();
@@ -161,7 +174,10 @@ static int decode_message(app_data_t *app, pn_rwbytes_t data) {
         pn_message_clear(m);
     }
 
+    fprintf(stderr, "Calling pn_message_decode with size: %ld\n", data.size);
+
     int err = pn_message_decode(m, data.start, data.size);
+
     if (!err) {
         fprintf(stderr, "Successful message decode\n");
         pn_data_t *body = pn_message_body(m);
@@ -176,8 +192,8 @@ static int decode_message(app_data_t *app, pn_rwbytes_t data) {
     } else {
         // Record the error.  Don't exit immediately
         //
-        app->amqp_decode_errs++; //*CS Never read anywhere. Are these ocurring?
-        fprintf(stderr, "AMQP Decode Error\n");
+        app->amqp_decode_errs++;  //*CS Never read anywhere. Are these ocurring?
+        fprintf(stderr, "AMQP Decode Error: %s\n", (pn_error_text(pn_message_error(m))));
         return 1;
     }
 

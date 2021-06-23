@@ -15,6 +15,9 @@
 #include <stdio.h>
 #include <time.h>
 
+//*CS
+#include <linux/limits.h>
+
 #include "bridge.h"
 
 #define LISTEN_BACKLOG 16
@@ -76,6 +79,15 @@ static void handle_receive(app_data_t *app, pn_event_t *event,
                                 "PN_DELIVERY error: %s", pn_code(recv));
             pn_link_close(l); /* Unexpected error, close the link */
         } else if (!pn_delivery_partial(d)) { /* Message is complete */
+
+            //*CS Write content to file for analysis
+            FILE *fptr;
+            char fname[PATH_MAX];
+            sprintf(fname, "/tmp/amqpdump%ld", app->amqp_received);
+            fptr = fopen(fname, "w");
+            fwrite(m->start, sizeof(char), m->size, fptr);
+            fclose(fptr);
+
             // Place in the ring buffer HERE
             rb_put(app->rbin);
 

@@ -122,6 +122,8 @@ pn_rwbytes_t *rb_get(rb_rwbytes_t *rb) {
 
         next = (rb->tail + 1) % rb->count;
         rb->queue_block++;
+
+        fprintf(stderr, "Woke up from pthread_cond_wait, next = %d\n", next);
     }
     // set data size to zero
     rb->ring_buffer[rb->tail].size = 0;
