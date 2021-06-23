@@ -278,15 +278,15 @@ void run(app_data_t *app) {
                 return;
             }
             if (batch_done) { //*CS I'm not seeing anywhere this can become
-                              //true, but the loop will exit when
-                              //pn_event_batch_next() returns NULL anyways
+                              // true, but the loop will exit when
+                              // pn_event_batch_next() returns NULL anyways
                 break;
             }
         }
 
         app->amqp_total_batches++; //*CS How is amqp_total_batches growing
-                                   //larger than amqp_received which increments
-                                   //inside handle()?
+                                   // larger than amqp_received which increments
+                                   // inside handle()?
         fprintf(stderr, "Done processing a batch\n");
         pn_proactor_done(app->proactor, events);
     } while (true);

@@ -161,7 +161,8 @@ static int decode_message(app_data_t *app, pn_rwbytes_t data) {
     static long int filecount = 0;
     char fname[PATH_MAX];
     sprintf(fname, "/tmp/rb-amqpdump%ld", filecount++);
-    fprintf(stderr, "Writing %s (%ld bytes from %p)\n", fname, data.size, data.start);
+    fprintf(stderr, "Writing %s (%ld bytes from %p)\n", fname, data.size,
+            data.start);
     fptr = fopen(fname, "w");
     fwrite(data.start, sizeof(char), data.size, fptr);
     fclose(fptr);
@@ -192,8 +193,9 @@ static int decode_message(app_data_t *app, pn_rwbytes_t data) {
     } else {
         // Record the error.  Don't exit immediately
         //
-        app->amqp_decode_errs++;  //*CS Never read anywhere. Are these ocurring?
-        fprintf(stderr, "AMQP Decode Error: %s\n", (pn_error_text(pn_message_error(m))));
+        app->amqp_decode_errs++; //*CS Never read anywhere. Are these ocurring?
+        fprintf(stderr, "AMQP Decode Error: %s\n",
+                (pn_error_text(pn_message_error(m))));
         return 1;
     }
 
